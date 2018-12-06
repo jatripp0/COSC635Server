@@ -1,0 +1,9 @@
+C:\Users\jatripp0\Downloads\ChatServer\ChatServer\ChatServer\bin\Debug\ChatServer.exe
+C:\Users\jatripp0\Downloads\ChatServer\ChatServer\ChatServer\bin\Debug\ChatServer.pdb
+C:\Users\jatripp0\Downloads\ChatServer\ChatServer\ChatServer\obj\Debug\ChatServer.csprojAssemblyReference.cache
+C:\Users\jatripp0\Downloads\ChatServer\ChatServer\ChatServer\obj\Debug\ChatServer.Properties.Resources.resources
+C:\Users\jatripp0\Downloads\ChatServer\ChatServer\ChatServer\obj\Debug\ChatServer.Server.resources
+C:\Users\jatripp0\Downloads\ChatServer\ChatServer\ChatServer\obj\Debug\ChatServer.csproj.GenerateResource.cache
+C:\Users\jatripp0\Downloads\ChatServer\ChatServer\ChatServer\obj\Debug\ChatServer.csproj.CoreCompileInputs.cache
+C:\Users\jatripp0\Downloads\ChatServer\ChatServer\ChatServer\obj\Debug\ChatServer.exe
+C:\Users\jatripp0\Downloads\ChatServer\ChatServer\ChatServer\obj\Debug\ChatServer.pdb

@@ -12,6 +12,7 @@ using System.Net;
 using System.Collections;
 
 using ChatApplication;
+using System.IO;
 
 namespace ChatServer
 {
@@ -19,11 +20,16 @@ namespace ChatServer
     {
         #region Private Members
 
+        private List<byte[]> outputData = new List<byte[]>();
+        private static int messageSize = 1000;
+        private static int packetSize = 1024;
+        private int currentSeqNum = -1;
+        private bool correctSeqRcvd = false;
+
         // Structure to store the client information
         private struct Client
         {
             public EndPoint endPoint;
-            public string name;
         }
 
         // Listing of clients
@@ -33,7 +39,7 @@ namespace ChatServer
         private Socket serverSocket;
 
         // Data stream
-        private byte[] dataStream = new byte[1024];
+        private byte[] dataStream = new byte[packetSize];
 
         // Status delegate
         private delegate void UpdateStatusDelegate(string status);
@@ -116,8 +122,16 @@ namespace ChatServer
             {
                 byte[] data;
 
+                
                 // Initialise a packet object to store the received data
                 Packet receivedData = new Packet(this.dataStream);
+
+                correctSeqRcvd = false;
+                if(Convert.ToInt32(receivedData.SequenceNum) == currentSeqNum+1)
+                {
+                    currentSeqNum++;
+                    correctSeqRcvd = true;
+                }
 
                 // Initialise a packet object to store the data to be sent
                 Packet sendData = new Packet();
@@ -138,7 +152,11 @@ namespace ChatServer
                 switch (receivedData.ClientDataIdentifier)
                 {
                     case DataIdentifier.Message:
-                        sendData.Message = string.Format("{0}", receivedData.Message);
+                        int ack = 1;
+                        sendData.Acknowledgement = ack.ToString();
+                        //sendData.Algorithm = receivedData.Algorithm;
+                        //sendData.WindowSize = receivedData.WindowSize;
+                        sendData.SequenceNum = receivedData.SequenceNum;
                         break;
 
                     case DataIdentifier.LogIn:
@@ -149,7 +167,19 @@ namespace ChatServer
                         // Add client to list
                         this.clientList.Add(client);
 
-                        sendData.Message = "User Logged In";
+                        String msg = "User Logged In";
+                        sendData.Message = Encoding.UTF8.GetBytes(msg);
+                        break;
+
+                    case DataIdentifier.LogOut:
+                        double percentageLost = BitConverter.ToDouble(receivedData.Message,0);
+                        Console.WriteLine(percentageLost);
+                        ack = 0;
+                        sendData.Acknowledgement = ack.ToString();
+                        sendData.Algorithm = receivedData.Algorithm;
+                        sendData.WindowSize = receivedData.WindowSize;
+                        sendData.SequenceNum = receivedData.SequenceNum;
+                        sendData.Message = receivedData.Message;
                         break;
 
                 }
@@ -158,12 +188,37 @@ namespace ChatServer
                 // Get packet as byte array
                 data = sendData.GetDataStream();
 
-                foreach (Client client in this.clientList)
+                if (correctSeqRcvd || receivedData.SequenceNum == "0")
                 {
-                    if (client.endPoint != epSender/* || sendData.ChatDataIdentifier != DataIdentifier.LogIn*/)
+                    foreach (Client client in this.clientList)
                     {
-                        // Broadcast to all logged on users
-                        serverSocket.BeginSendTo(data, 0, data.Length, SocketFlags.None, client.endPoint, new AsyncCallback(this.SendData), client.endPoint);
+                        if (client.endPoint != epSender /*|| sendData.ClientDataIdentifier != DataIdentifier.LogIn*/)
+                        {
+                            // Broadcast to all logged on users
+                            serverSocket.BeginSendTo(data, 0, data.Length, SocketFlags.None, client.endPoint, new AsyncCallback(this.SendData), client.endPoint);
+                        }
+                    }
+
+                    if (receivedData.ClientDataIdentifier == DataIdentifier.Message)
+                    {
+                        using (StreamWriter sw = File.AppendText("output.txt"))
+                        {
+                            sw.WriteLine(System.Text.Encoding.Default.GetString(receivedData.Message));
+                        }
+
+                    }
+                }
+                else
+                {
+                    foreach (Client client in this.clientList)
+                    {
+                        if (client.endPoint != epSender /*|| sendData.ClientDataIdentifier != DataIdentifier.LogIn*/)
+                        {
+                            sendData.SequenceNum = currentSeqNum.ToString();
+                            data = sendData.GetDataStream();
+                            // Broadcast to all logged on users
+                            serverSocket.BeginSendTo(data, 0, data.Length, SocketFlags.None, client.endPoint, new AsyncCallback(this.SendData), client.endPoint);
+                        }
                     }
                 }
 
@@ -171,7 +226,9 @@ namespace ChatServer
                 serverSocket.BeginReceiveFrom(this.dataStream, 0, this.dataStream.Length, SocketFlags.None, ref epSender, new AsyncCallback(this.ReceiveData), epSender);
 
                 // Update status through a delegate
-                this.Invoke(this.updateStatusDelegate, new object[] { sendData.Message });
+
+                if(sendData.Algorithm == "0")
+                    this.Invoke(this.updateStatusDelegate, new object[] { System.Text.Encoding.Default.GetString(sendData.Message) });
             }
             catch (Exception ex)
             {

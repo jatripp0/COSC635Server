@@ -36,15 +36,16 @@
             // 
             // rtxtStatus
             // 
-            this.rtxtStatus.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.rtxtStatus.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.rtxtStatus.Location = new System.Drawing.Point(12, 33);
             this.rtxtStatus.Name = "rtxtStatus";
             this.rtxtStatus.ReadOnly = true;
             this.rtxtStatus.Size = new System.Drawing.Size(412, 219);
             this.rtxtStatus.TabIndex = 0;
             this.rtxtStatus.Text = "";
+            this.rtxtStatus.Visible = false;
             // 
             // label1
             // 
