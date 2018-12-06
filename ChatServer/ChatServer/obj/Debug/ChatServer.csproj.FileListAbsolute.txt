@@ -8,3 +8,13 @@ C:\Users\jatripp0\Downloads\ChatServer\ChatServer\ChatServer\obj\Debug\ChatServe
 C:\Users\jatripp0\Downloads\ChatServer\ChatServer\ChatServer\obj\Debug\ChatServer.exe
 C:\Users\jatripp0\Downloads\ChatServer\ChatServer\ChatServer\obj\Debug\ChatServer.pdb
 C:\Users\jatripp0\Downloads\ChatServer\ChatServer\ChatServer\bin\Debug\ChatServer.exe.config
+C:\Users\John\Documents\GitHub\COSC635Server\ChatServer\ChatServer\bin\Debug\ChatServer.exe.config
+C:\Users\John\Documents\GitHub\COSC635Server\ChatServer\ChatServer\bin\Debug\ChatServer.exe
+C:\Users\John\Documents\GitHub\COSC635Server\ChatServer\ChatServer\bin\Debug\ChatServer.pdb
+C:\Users\John\Documents\GitHub\COSC635Server\ChatServer\ChatServer\obj\Debug\ChatServer.csprojAssemblyReference.cache
+C:\Users\John\Documents\GitHub\COSC635Server\ChatServer\ChatServer\obj\Debug\ChatServer.Properties.Resources.resources
+C:\Users\John\Documents\GitHub\COSC635Server\ChatServer\ChatServer\obj\Debug\ChatServer.Server.resources
+C:\Users\John\Documents\GitHub\COSC635Server\ChatServer\ChatServer\obj\Debug\ChatServer.csproj.GenerateResource.cache
+C:\Users\John\Documents\GitHub\COSC635Server\ChatServer\ChatServer\obj\Debug\ChatServer.csproj.CoreCompileInputs.cache
+C:\Users\John\Documents\GitHub\COSC635Server\ChatServer\ChatServer\obj\Debug\ChatServer.exe
+C:\Users\John\Documents\GitHub\COSC635Server\ChatServer\ChatServer\obj\Debug\ChatServer.pdb

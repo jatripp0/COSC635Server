@@ -1,4 +1,4 @@
-﻿namespace ChatServer
+﻿namespace Server
 {
     partial class Server
     {

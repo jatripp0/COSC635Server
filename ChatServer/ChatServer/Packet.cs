@@ -4,12 +4,6 @@ using System.Text;
 
 namespace ChatApplication
 {
-    // ----------------
-    // Packet Structure
-    // ----------------
-
-    // Description   -> |dataIdentifier|name length|message length|    name   |    message   |
-    // Size in bytes -> |       4      |     4     |       4      |name length|message length|
     public enum DataIdentifier
     {
         Message,
@@ -95,8 +89,8 @@ namespace ChatApplication
 
             this.windowSize = BitConverter.ToInt32(dataStream, 16).ToString();
 
-            // Read the length of the message (4 bytes)
-            int msgLength = 1000/*BitConverter.ToInt32(dataStream, 20)*/;
+            
+            int msgLength = 1000;
 
             // Read the message field
             if (msgLength > 0) {

@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
@@ -14,7 +10,7 @@ using System.Collections;
 using ChatApplication;
 using System.IO;
 
-namespace ChatServer
+namespace Server
 {
     public partial class Server : Form
     {
@@ -31,17 +27,13 @@ namespace ChatServer
         {
             public EndPoint endPoint;
         }
-
-        // Listing of clients
         private ArrayList clientList;
-
-        // Server socket
         private Socket serverSocket;
 
-        // Data stream
+        // Used to hold packet data
         private byte[] dataStream = new byte[packetSize];
 
-        // Status delegate
+        //Updates visual display components of application
         private delegate void UpdateStatusDelegate(string status);
         private UpdateStatusDelegate updateStatusDelegate = null;
 
@@ -62,31 +54,18 @@ namespace ChatServer
         {
             try
             {
-                // Initialise the ArrayList of connected clients
                 this.clientList = new ArrayList();
-
-                // Initialise the delegate which updates the status
                 this.updateStatusDelegate = new UpdateStatusDelegate(this.UpdateStatus);
-
-                // Initialise the socket
                 serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-
-                // Initialise the IPEndPoint for the server and listen on port 30000
                 IPEndPoint server = new IPEndPoint(IPAddress.Any, 30000);
-
-                // Associate the socket with this IP address and port
                 serverSocket.Bind(server);
-
-                // Initialise the IPEndPoint for the clients
                 IPEndPoint clients = new IPEndPoint(IPAddress.Any, 0);
-
-                // Initialise the EndPoint for the clients
                 EndPoint epSender = (EndPoint)clients;
 
-                // Start listening for incoming data
+                // Listen for packets
                 serverSocket.BeginReceiveFrom(this.dataStream, 0, this.dataStream.Length, SocketFlags.None, ref epSender, new AsyncCallback(ReceiveData), epSender);
 
-                lblStatus.Text = "Listening";
+                lblStatus.Text = "Connected. Listening for incoming packets.";
             }
             catch (Exception ex)
             {
@@ -123,7 +102,7 @@ namespace ChatServer
                 byte[] data;
 
                 
-                // Initialise a packet object to store the received data
+                // Initialise a packet to store the received data
                 Packet receivedData = new Packet(this.dataStream);
 
                 correctSeqRcvd = false;
@@ -133,20 +112,15 @@ namespace ChatServer
                     correctSeqRcvd = true;
                 }
 
-                // Initialise a packet object to store the data to be sent
+                // Initialise a packet to store the data to be sent
                 Packet sendData = new Packet();
 
-                // Initialise the IPEndPoint for the clients
                 IPEndPoint clients = new IPEndPoint(IPAddress.Any, 0);
-
-                // Initialise the EndPoint for the clients
                 EndPoint epSender = (EndPoint)clients;
 
-                // Receive all data
+                // Receive data
                 serverSocket.EndReceiveFrom(asyncResult, ref epSender);
 
-                
-                // Start populating the packet to be sent
                 sendData.ClientDataIdentifier = receivedData.ClientDataIdentifier;
 
                 switch (receivedData.ClientDataIdentifier)
@@ -160,11 +134,8 @@ namespace ChatServer
                         break;
 
                     case DataIdentifier.LogIn:
-                        // Populate client object
                         Client client = new Client();
                         client.endPoint = epSender;
-
-                        // Add client to list
                         this.clientList.Add(client);
 
                         String msg = "User Logged In";
@@ -194,13 +165,13 @@ namespace ChatServer
                     {
                         if (client.endPoint != epSender /*|| sendData.ClientDataIdentifier != DataIdentifier.LogIn*/)
                         {
-                            // Broadcast to all logged on users
                             serverSocket.BeginSendTo(data, 0, data.Length, SocketFlags.None, client.endPoint, new AsyncCallback(this.SendData), client.endPoint);
                         }
                     }
 
                     if (receivedData.ClientDataIdentifier == DataIdentifier.Message)
                     {
+                        //Write to output file
                         using (StreamWriter sw = File.AppendText("output.txt"))
                         {
                             sw.WriteLine(System.Text.Encoding.Default.GetString(receivedData.Message));
@@ -216,16 +187,12 @@ namespace ChatServer
                         {
                             sendData.SequenceNum = currentSeqNum.ToString();
                             data = sendData.GetDataStream();
-                            // Broadcast to all logged on users
                             serverSocket.BeginSendTo(data, 0, data.Length, SocketFlags.None, client.endPoint, new AsyncCallback(this.SendData), client.endPoint);
                         }
                     }
                 }
 
-                // Listen for more connections again...
                 serverSocket.BeginReceiveFrom(this.dataStream, 0, this.dataStream.Length, SocketFlags.None, ref epSender, new AsyncCallback(this.ReceiveData), epSender);
-
-                // Update status through a delegate
 
                 if(sendData.Algorithm == "0")
                     this.Invoke(this.updateStatusDelegate, new object[] { System.Text.Encoding.Default.GetString(sendData.Message) });
